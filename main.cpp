@@ -1,3 +1,4 @@
+#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
 #include <cstdlib>
@@ -8,22 +9,23 @@ using namespace std;
 
 class Mastermind {
 private:
-    vector<int> CC;    // combinaison cachée
-    vector<int> CJ;    // combinaison jouée
+    vector<int> CC;
+    vector<vector<int>> tentatives;  // ensemble des combinaisons jouées
     int compt;
     bool victoire;
 
 public:
-    const int NC = 8;  // nombre de couleurs
-    const int NT = 12; // nombre d'essais maximal
-    const int LC = 4;  // longueur de la combinaison
+    const int NC = 8;
+    const int NT = 12;
+    const int LC = 4;
 
-    Mastermind() : compt(0), victoire(false) {
+    Mastermind(){
         srand(time(0));
-        CC = creeCombinaison();  // Création de la combinaison cachée
-        CJ = vector<int>(LC, NC); // Init combinaison jouée avec combinaison invalide
+        compt=0;
+        victoire=false;
+        CC = creeCombinaison(); // Création de la combinaison cachée
+        tentatives.resize(NT, vector<int>(LC, -1)); // -1 pour dire que ce n'est pas encore joué
     }
-
     vector<int> creeCombinaison() {
         vector<int> Cc(LC);
         for (int i = 0; i < LC; ++i) {
@@ -32,129 +34,175 @@ public:
         return Cc;
     }
 
-    vector<int> getCombinaisonCachee() const {
-        return CC;
+    bool setCouleur(int colonne, int couleur) {
+        if (colonne < 0 || colonne >= LC || couleur < 0 || couleur >= NC) return false; // souci de couleur ou colonne de jeu invalide
+        tentatives[compt][colonne] = couleur;
+        return true;
     }
 
-    vector<int> getCombinaisonJouee() const {
-        return CJ;
+    bool tentativeComplete() const {
+        for (int i = 0; i < LC; ++i) {
+            if (tentatives[compt][i] == -1) return false; // au moins un pion n'a pas été placé
+        }
+        return true;
     }
 
-    void setCombinaisonJouee(const vector<int>& combi) {
-        assert(combi.size() == LC);
-        CJ = combi;
-    }
-
-// Compare les combinaisons et retourne bien placés et bonnes couleurs
-    pair<int, int> calculReponse() const{
-        assert(CC.size() == CJ.size());
-        int N = CC.size();
+    pair<int, int> calculReponse(int colonne) const {
         vector<int> Cc2 = CC;
-        vector<int> Cj2 = CJ; //travail sur une copie
+        vector<int> Cj2 = tentatives[colonne];
 
-        int nbP = 0; // compter les bien placés
-        for (int i = 0; i < N; ++i) {
-            if (Cc2[i] == Cj2[i]) {
+        int nbP = 0;
+        for (int i = 0; i < LC; ++i) {
+            if (Cj2[i] == Cc2[i]) {
                 nbP++;
-                Cc2[i] = NC;
-                Cj2[i] = NC; // une fois qu'un pion est comptabilisé on remplace par NC valeur impossible pour ne pas le recompter
+                Cj2[i] = Cc2[i] = NC; // une fois qu'un pion est comptabilisé on remplace par NC valeur impossible pour ne pas le recompter
             }
         }
-
         int nbC = 0; // compter les bonnes couleurs mal placés
-        for (int i = 0; i < N; ++i) {
+        for (int i = 0; i < LC; ++i) {
             if (Cj2[i] != NC) {
-                for (int j = 0; j < N; ++j) {
+                for (int j = 0; j < LC; ++j) {
                     if (Cc2[j] == Cj2[i]) {
                         nbC++;
                         Cc2[j] = NC;
-                        Cj2[i] = NC;
-                        break; //inutile de poursuivre
+                        break;//inutile de poursuivre
                     }
                 }
             }
         }
-
         return make_pair(nbP, nbC);
     }
 
-    int getNbCoups() const {
-        return compt;
+
+    void prochainCoup() {
+        if (calculReponse(compt).first == LC){
+                victoire = true; // il y a eu victoire sur le dernier coup joué
+        }
+        compt++; // on inclémente le compteur
     }
-    void incrementeCoup() {
-        compt++;
-    }
+
     bool estVictoire() const {
         return victoire;
     }
-    void setVictoire(bool v) {
-        victoire = v;
+
+    bool estFini() const {
+        return compt >= NT || victoire; // un jeu est fini lorsque il y a eu trop d'essais ou une victoire
     }
 
-    // afficher la combinaison cachée : pour le debogage
-    void afficheDebug() const {
-        cout << "DEBUG - Combinaison cachée : ";
-        for (int i=0;i<LC;i++) {
-        cout << CC[i] << " ";
-        }
+    int getcompt() const {
+        return compt;
+    }
 
-    cout << endl;
+    const vector<vector<int>> getTentatives() const {
+        return tentatives;
+    }
+
+    const vector<int> getCombinaisonCachee() const {
+        return CC;
     }
 };
 
-ostream& operator<<(ostream& os, const Mastermind& jeu) {
-    os << "Combinaison jouée  : ";
-    vector<int> cj = jeu.getCombinaisonJouee();
-    for (int i=0;i<jeu.LC;i++) {
-        os << cj[i] << " ";
-    }
-    os << "\n";
-
-    pair<int,int> res = jeu.calculReponse();  // car non-const
-    os << res.first << " bien placé(s), " << res.second << " bonne(s) couleur(s).\n";
-
-    return os;
-}
-
-
+// Palette de couleurs SFML
+const vector<sf::Color> couleurs = {
+    sf::Color::Red,
+    sf::Color::Blue,
+    sf::Color::Green,
+    sf::Color::Yellow,
+    sf::Color::Magenta,
+    sf::Color::Cyan,
+    sf::Color(255, 165, 0), // Orange
+    sf::Color(128, 0, 128)  // Violet
+};
 
 int main() {
     Mastermind jeu;
+    const int taillePion = 40; // taille du pion
+    const int marge = 10; // marge entre deux pions
 
-    // Affichage debug de la combinaison cachée
-    jeu.afficheDebug();
+    sf::RenderWindow window(sf::VideoMode(500, 700), "Mastermind SFML"); // création fenêtre
 
-    while (jeu.getNbCoups() < jeu.NT && !jeu.estVictoire()) {
-        jeu.incrementeCoup();
+    int couleur = 0;
 
-        vector<int> tentative(jeu.LC);
-        cout << "\nTentative " << jeu.getNbCoups() << " : Entrez " << jeu.LC << " valeurs entre 0 et " << jeu.NC - 1 << " :\n";
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) { // Gérer évènements venant de l'utilisateur
+            if (event.type == sf::Event::Closed)
+                window.close(); // Cliquer sur la croix -> fermer
+            else if (event.type == sf::Event::MouseButtonPressed && !jeu.estFini()) { // clic de souris et jeu non fini
+                int x = event.mouseButton.x;
+                int y = event.mouseButton.y; // récup des cooroonnées
 
-        for (int i = 0; i < jeu.LC; ++i) {
-            int x;
-            cin >> x;
-            assert(x >= 0 && x < jeu.NC);
-            tentative[i] = x;
+
+                if (y > 650) { // clic dans la zone de sélection couleur en bas (par défaut 0,0 dans l'angle en haut à gauche
+                    int index = x / (taillePion + marge);
+                    if (index >= 0 && index < jeu.NC){
+                            couleur = index; // c'est bien une couleur
+                    }
+                }
+
+                else { // vérifier si le joueur tente de placer dans la grille sa tentative
+                    int tour = jeu.getcompt();
+                    for (int col = 0; col < jeu.LC; ++col) {
+                        int cx = 50 + col * (taillePion + marge);
+                        int cy = 50 + tour * (taillePion + marge);
+                        sf::FloatRect rect(cx, cy, taillePion, taillePion);
+                        if (rect.contains(x, y)) {
+                            jeu.setCouleur(col, couleur);
+                        }
+                    }
+                }
+            } else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) { // Entrer pour valider une tentative
+                if (jeu.tentativeComplete() && !jeu.estFini()) { // si la tentative a été valide et que le jeu n'est pas fini on passe au coup suivant
+                    jeu.prochainCoup();
+                }
+            }
         }
 
-        jeu.setCombinaisonJouee(tentative);
+        window.clear(sf::Color(50, 50, 50));// efface écran et met un fond gris / noir
 
-        // Affichage de la tentative et du résultat
-        cout << jeu;
+        // Dessiner la grille
+        const vector<vector<int>> tentatives = jeu.getTentatives(); // récupérer les combinaisons déjà jouées
+        for (int i = 0; i < jeu.NT; ++i) {
+            for (int j = 0; j < jeu.LC; ++j) {
+                sf::CircleShape pion(taillePion / 2); // créer chaque cercle de la grille (potentiellement vide)
+                pion.setPosition(50 + j * (taillePion + marge), 50 + i * (taillePion + marge)); // les positionner
+                int coul = tentatives[i][j];
+                if (coul >= 0 && coul < couleurs.size()) // il y a vraiment une couleur qui a été jouée ici
+                    pion.setFillColor(couleurs[coul]); // on colorie = remplissage du cercle de cette couleur
+                else
+                    pion.setFillColor(sf::Color(100, 100, 100)); // sinon on n'a pas encore joué on laisse une nuance de gris pour indiquer vide
+                window.draw(pion); // Après avoir défini toutes les caractéristiques on le dessine
+            }
 
-        if (jeu.calculReponse().first == jeu.LC) {
-            jeu.setVictoire(true);
+            // Affichage du résultat de la combinaison jouée
+            if (i < jeu.getcompt()) {
+                pair<int,int> res = jeu.calculReponse(i);
+                for (int k = 0; k < res.first; ++k) {
+                    sf::CircleShape resultatBP(8);
+                    resultatBP.setFillColor(sf::Color::Red);
+                    resultatBP.setPosition(300 + k * 20, 50 + i * (taillePion + marge));
+                    window.draw(resultatBP); // on affiche autant de pions rouges que de pions bien placés
+                }
+                for (int k = 0; k < res.second; ++k) {
+                    sf::CircleShape resultatBC(8);
+                    resultatBC.setFillColor(sf::Color::White);
+                    resultatBC.setPosition(300 + (res.first + k) * 20, 50 + i * (taillePion + marge));
+                    window.draw(resultatBC); // on affiche autant de pions blancs que de pions de bonne couleur mais mal placés
+                }
+            }
         }
-    }
 
-    if (jeu.estVictoire()) {
-        cout << "\nBRAVO ! Vous avez gagné en " << jeu.getNbCoups() << " coups." << endl;
-    } else {
-        cout << "\nPERDU... la combinaison était : ";
-        for (int val : jeu.getCombinaisonCachee()) {
-            cout << val << " ";
+        // Affiche la palette de couleurs en bas de la fenêtre
+        for (int i = 0; i < jeu.NC; ++i) {
+            sf::CircleShape colorPick(taillePion / 2);
+            colorPick.setPosition(i * (taillePion + marge), 650);
+            colorPick.setFillColor(couleurs[i]); // on affiche toutes les couleurs possibles définies plus haut
+            if (i == couleur) // c'est ce pion là qui est sélectionné
+                colorPick.setOutlineColor(sf::Color::White), colorPick.setOutlineThickness(3); // ajouter un contour blanc pour dire que c'est sélectionné : effet de surbrillance
+            window.draw(colorPick);
         }
-        cout << endl;
+
+        window.display();
     }
 
     return 0;
