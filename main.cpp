@@ -10,7 +10,7 @@ using namespace std;
 class Mastermind {
 private:
     vector<int> CC;
-    vector<vector<int>> tentatives;  // ensemble des combinaisons jou�es
+    vector<vector<int>> tentatives;  // ensemble des combinaisons jouées
     int compt;
     bool victoire;
 
@@ -23,8 +23,8 @@ public:
         srand(time(0));
         compt=0;
         victoire=false;
-        CC = creeCombinaison(); // Cr�ation de la combinaison cach�e
-        tentatives.resize(NT, vector<int>(LC, -1)); // -1 pour dire que ce n'est pas encore jou�
+        CC = creeCombinaison(); // Création de la combinaison cachée
+        tentatives.resize(NT, vector<int>(LC, -1)); // -1 pour dire que ce n'est pas encore joué
     }
     vector<int> creeCombinaison() {
         vector<int> Cc(LC);
@@ -42,7 +42,7 @@ public:
 
     bool tentativeComplete() const {
         for (int i = 0; i < LC; ++i) {
-            if (tentatives[compt][i] == -1) return false; // au moins un pion n'a pas �t� plac�
+            if (tentatives[compt][i] == -1) return false; // au moins un pion n'a pas été placé
         }
         return true;
     }
@@ -55,10 +55,10 @@ public:
         for (int i = 0; i < LC; ++i) {
             if (Cj2[i] == Cc2[i]) {
                 nbP++;
-                Cj2[i] = Cc2[i] = NC; // une fois qu'un pion est comptabilis� on remplace par NC valeur impossible pour ne pas le recompter
+                Cj2[i] = Cc2[i] = NC; // une fois qu'un pion est comptabilisé on remplace par NC valeur impossible pour ne pas le recompter
             }
         }
-        int nbC = 0; // compter les bonnes couleurs mal plac�s
+        int nbC = 0; // compter les bonnes couleurs mal placés
         for (int i = 0; i < LC; ++i) {
             if (Cj2[i] != NC) {
                 for (int j = 0; j < LC; ++j) {
@@ -76,9 +76,9 @@ public:
 
     void prochainCoup() {
         if (calculReponse(compt).first == LC){
-                victoire = true; // il y a eu victoire sur le dernier coup jou�
+                victoire = true; // il y a eu victoire sur le dernier coup joué
         }
-        compt++; // on incl�mente le compteur
+        compt++; // on inclémente le compteur
     }
 
     bool estVictoire() const {
@@ -114,33 +114,33 @@ const vector<sf::Color> couleurs = {
     sf::Color(128, 0, 128)  // Violet
 };
 
-int main() {
+/*int main() {
     Mastermind jeu;
     const int taillePion = 40; // taille du pion
     const int marge = 10; // marge entre deux pions
 
-    sf::RenderWindow window(sf::VideoMode(500, 700), "Mastermind SFML"); // cr�ation fen�tre
+    sf::RenderWindow window(sf::VideoMode(500, 700), "Mastermind SFML"); // création fenêtre
 
     int couleur = 0;
 
     while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event)) { // G�rer �v�nements venant de l'utilisateur
+        while (window.pollEvent(event)) { // Gérer évènements venant de l'utilisateur
             if (event.type == sf::Event::Closed)
                 window.close(); // Cliquer sur la croix -> fermer
             else if (event.type == sf::Event::MouseButtonPressed && !jeu.estFini()) { // clic de souris et jeu non fini
                 int x = event.mouseButton.x;
-                int y = event.mouseButton.y; // r�cup des cooroonn�es
+                int y = event.mouseButton.y; // récup des cooroonnées
 
 
-                if (y > 650) { // clic dans la zone de s�lection couleur en bas (par d�faut 0,0 dans l'angle en haut � gauche
+                if (y > 650) { // clic dans la zone de sélection couleur en bas (par défaut 0,0 dans l'angle en haut à gauche
                     int index = x / (taillePion + marge);
                     if (index >= 0 && index < jeu.NC){
                             couleur = index; // c'est bien une couleur
                     }
                 }
 
-                else { // v�rifier si le joueur tente de placer dans la grille sa tentative
+                else { // vérifier si le joueur tente de placer dans la grille sa tentative
                     int tour = jeu.getcompt();
                     for (int col = 0; col < jeu.LC; ++col) {
                         int cx = 50 + col * (taillePion + marge);
@@ -152,55 +152,236 @@ int main() {
                     }
                 }
             } else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) { // Entrer pour valider une tentative
-                if (jeu.tentativeComplete() && !jeu.estFini()) { // si la tentative a �t� valide et que le jeu n'est pas fini on passe au coup suivant
+                if (jeu.tentativeComplete() && !jeu.estFini()) { // si la tentative a été valide et que le jeu n'est pas fini on passe au coup suivant
                     jeu.prochainCoup();
                 }
             }
         }
 
-        window.clear(sf::Color(50, 50, 50));// efface �cran et met un fond gris / noir
+        window.clear(sf::Color(50, 50, 50));// efface écran et met un fond gris / noir
 
         // Dessiner la grille
-        const vector<vector<int>> tentatives = jeu.getTentatives(); // r�cup�rer les combinaisons d�j� jou�es
+        const vector<vector<int>> tentatives = jeu.getTentatives(); // récupérer les combinaisons déjà jouées
         for (int i = 0; i < jeu.NT; ++i) {
             for (int j = 0; j < jeu.LC; ++j) {
-                sf::CircleShape pion(taillePion / 2); // cr�er chaque cercle de la grille (potentiellement vide)
+                sf::CircleShape pion(taillePion / 2); // créer chaque cercle de la grille (potentiellement vide)
                 pion.setPosition(50 + j * (taillePion + marge), 50 + i * (taillePion + marge)); // les positionner
                 int coul = tentatives[i][j];
-                if (coul >= 0 && coul < couleurs.size()) // il y a vraiment une couleur qui a �t� jou�e ici
+                if (coul >= 0 && coul < couleurs.size()) // il y a vraiment une couleur qui a été jouée ici
                     pion.setFillColor(couleurs[coul]); // on colorie = remplissage du cercle de cette couleur
                 else
-                    pion.setFillColor(sf::Color(100, 100, 100)); // sinon on n'a pas encore jou� on laisse une nuance de gris pour indiquer vide
-                window.draw(pion); // Apr�s avoir d�fini toutes les caract�ristiques on le dessine
+                    pion.setFillColor(sf::Color(100, 100, 100)); // sinon on n'a pas encore joué on laisse une nuance de gris pour indiquer vide
+                window.draw(pion); // Après avoir défini toutes les caractéristiques on le dessine
             }
 
-            // Affichage du r�sultat de la combinaison jou�e
+            // Affichage du résultat de la combinaison jouée
             if (i < jeu.getcompt()) {
                 pair<int,int> res = jeu.calculReponse(i);
                 for (int k = 0; k < res.first; ++k) {
                     sf::CircleShape resultatBP(8);
                     resultatBP.setFillColor(sf::Color::Red);
                     resultatBP.setPosition(300 + k * 20, 50 + i * (taillePion + marge));
-                    window.draw(resultatBP); // on affiche autant de pions rouges que de pions bien plac�s
+                    window.draw(resultatBP); // on affiche autant de pions rouges que de pions bien placés
                 }
                 for (int k = 0; k < res.second; ++k) {
                     sf::CircleShape resultatBC(8);
                     resultatBC.setFillColor(sf::Color::White);
                     resultatBC.setPosition(300 + (res.first + k) * 20, 50 + i * (taillePion + marge));
-                    window.draw(resultatBC); // on affiche autant de pions blancs que de pions de bonne couleur mais mal plac�s
+                    window.draw(resultatBC); // on affiche autant de pions blancs que de pions de bonne couleur mais mal placés
                 }
             }
         }
 
-        // Affiche la palette de couleurs en bas de la fen�tre
+        // Affiche la palette de couleurs en bas de la fenêtre
         for (int i = 0; i < jeu.NC; ++i) {
             sf::CircleShape colorPick(taillePion / 2);
             colorPick.setPosition(i * (taillePion + marge), 650);
-            colorPick.setFillColor(couleurs[i]); // on affiche toutes les couleurs possibles d�finies plus haut
-            if (i == couleur) // c'est ce pion l� qui est s�lectionn�
-                colorPick.setOutlineColor(sf::Color::White), colorPick.setOutlineThickness(3); // ajouter un contour blanc pour dire que c'est s�lectionn� : effet de surbrillance
+            colorPick.setFillColor(couleurs[i]); // on affiche toutes les couleurs possibles définies plus haut
+            if (i == couleur) // c'est ce pion là qui est sélectionné
+                colorPick.setOutlineColor(sf::Color::White), colorPick.setOutlineThickness(3); // ajouter un contour blanc pour dire que c'est sélectionné : effet de surbrillance
             window.draw(colorPick);
         }
+
+        window.display();
+    }
+
+    return 0;
+}*/
+
+
+int main() {
+    Mastermind jeu;
+    const int taillePion = 40; // taille du pion
+    const int marge = 10; // marge entre deux pions
+
+    sf::RenderWindow window(sf::VideoMode(600, 700), "Mastermind SFML"); // création fenêtre
+
+    sf::Font font;
+    if (!font.loadFromFile("Roboto-Regular.ttf")) { // charge une police
+        cerr << "Erreur de chargement de la police\n";
+        return 1; // message d'erreur de chargement
+    }
+
+    bool jeudebut = false; // tant que le joueur n'a pas cliqué sur jouer
+    int couleur = 0; // couleur sélectionnée par le joueur
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) { // permet de gérer les évènements ie les clics, actions de l'utilisateur
+            if (event.type == sf::Event::Closed)
+                window.close(); // croix cliquée = fermer la fenêtre
+
+            if (!jeudebut) { // on se situe en page d'accueil
+                if (event.type == sf::Event::MouseButtonPressed) {
+                    int x = event.mouseButton.x;
+                    int y = event.mouseButton.y;
+                    if (x >= 150 && x <= 350 && y >= 550 && y <= 600) { // c'est le bouton jouer qui a été cliqué
+                        jeudebut = true;
+                    }
+                }
+                continue;
+            }
+
+            if (event.type == sf::Event::MouseButtonPressed && !jeu.estFini()) { // gestion des clics souris tant que jeu pas fini
+                int x = event.mouseButton.x;
+                int y = event.mouseButton.y;
+                if (y > 650) { // on est certainement dans la palette de couleurs
+                    int index = x / (taillePion + marge); // indice de la couleur cliquée
+                    if (index >= 0 && index < jeu.NC)
+                        couleur = index;
+                } else { // on est certainement en train d'essayer de poser sur la grille
+                    int tour = jeu.getcompt();
+                    for (int col = 0; col < jeu.LC; ++col) { // pour chaque pion de la ligne en cours de remplissage
+                        int cx = 50 + col * (taillePion + marge);
+                        int cy = 50 + tour * (taillePion + marge);
+                        sf::FloatRect rect(cx, cy, taillePion, taillePion);
+                        if (rect.contains(x, y)) { // c'est l'endroit cliqué
+                            jeu.setCouleur(col, couleur); // placer la couleur sélectionnée
+                        }
+                    }
+                }
+            }
+
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
+                if (jeu.tentativeComplete() && !jeu.estFini()) {
+                    jeu.prochainCoup(); // touche entrée permet de valider la tentative de jeu
+                }
+            }
+        }
+
+        window.clear(sf::Color(50, 50, 50)); // effacer fenêtre : fond gris foncé
+
+        if (!jeudebut) {
+            // Affichage page d'accueil
+            sf::Text titre("Bienvenue dans Mastermind !", font, 30);
+            titre.setPosition(50, 50);
+            titre.setFillColor(sf::Color::White);
+
+            sf::Text regles(
+                "But : Trouver la bonne combinaison de 4 couleurs.\n"
+                "Chaque couleur peut apparaître plusieurs fois.\n"
+                "Rouge = bien placé, Blanc = bonne couleur mal placée.\n"
+                "12 tentatives maximum !\n"
+                "Remplir les lignes une par une en commençant par le haut, \n"
+                "Cliquer sur entrée une fois la ligne remplie pour valider \n"
+                "votre tentative.",
+                font, 20
+            );
+            regles.setPosition(50, 120);
+            regles.setFillColor(sf::Color::White); // afficher les règles en blanc
+
+            sf::RectangleShape bouton(sf::Vector2f(200, 50));
+            bouton.setPosition(150, 550);
+            bouton.setFillColor(sf::Color::Green);
+
+            sf::Text texteBouton("Jouer", font, 24);
+            texteBouton.setPosition(215, 560);
+            texteBouton.setFillColor(sf::Color::Black); // créer un bouton vert avec écriture noire jouer
+
+            window.draw(titre);
+            window.draw(regles);
+            window.draw(bouton);
+            window.draw(texteBouton);
+            window.display(); // affichage de tous les éléments définis
+            continue; // on poursuit cette boucle tant que le jeu n'a pas commencé
+        }
+
+        // Jeu en cours
+        const vector<vector<int>> tentatives = jeu.getTentatives();
+        for (int i = 0; i < jeu.NT; ++i) {
+            for (int j = 0; j < jeu.LC; ++j) {
+                sf::CircleShape pion(taillePion / 2);  // créer chaque cercle de la grille (potentiellement vide)
+                pion.setPosition(50 + j * (taillePion + marge), 50 + i * (taillePion + marge)); // les positionner
+                unsigned int coul = tentatives[i][j]; // couleur jouée ici
+                if (coul >= 0 && coul < couleurs.size()) // il y a vraiment une couleur qui a été jouée ici
+                    pion.setFillColor(couleurs[coul]); // on colorie = remplissage du cercle de cette couleur
+                else
+                    pion.setFillColor(sf::Color(100, 100, 100)); // sinon on n'a pas encore joué on laisse une nuance de gris pour indiquer vide
+                window.draw(pion); // Après avoir défini toutes les caractéristiques on le dessine
+            }
+
+            if (i < jeu.getcompt()) {
+                pair<int, int> res = jeu.calculReponse(i);
+                for (int k = 0; k < res.first; ++k) {
+                    sf::CircleShape resultatBP(8);
+                    resultatBP.setFillColor(sf::Color::Red);
+                    resultatBP.setPosition(300 + k * 20, 50 + i * (taillePion + marge));
+                    window.draw(resultatBP); // on affiche autant de pions rouges que de pions bien placés
+                }
+                for (int k = 0; k < res.second; ++k) {
+                    sf::CircleShape resultatBC(8);
+                    resultatBC.setFillColor(sf::Color::White);
+                    resultatBC.setPosition(300 + (res.first + k) * 20, 50 + i * (taillePion + marge));
+                    window.draw(resultatBC); // on affiche autant de pions blancs que de bonnes couleurs
+                }
+            }
+        }
+
+        // Afficher la palette
+        for (int i = 0; i < jeu.NC; ++i) {
+            sf::CircleShape colorPick(taillePion / 2);
+            colorPick.setPosition(i * (taillePion + marge), 650);
+            colorPick.setFillColor(couleurs[i]); // on affiche toutes les couleurs possibles définies plus haut
+            if (i == couleur)
+                colorPick.setOutlineColor(sf::Color::White), colorPick.setOutlineThickness(3); // contour blanc du pion = créer un effet de surbrillance pour la couleur sélectionnée
+            window.draw(colorPick);
+        }
+
+        if (jeu.estFini()) {
+            // Nettoie la fenêtre
+            window.clear(sf::Color(30, 30, 30));
+
+            // Affiche message de victoire ou défaite
+            sf::Text finText("", font, 32);
+            finText.setPosition(50, 100);
+            finText.setFillColor(sf::Color::White);
+
+            if (jeu.estVictoire()) {
+                finText.setString(" Bravo ! Vous avez gagné !");
+            } else {
+                finText.setString(" Dommage ! Vous avez perdu !");
+            }
+            window.draw(finText);
+
+            sf::Text combiText("La combinaison était :", font, 24);
+            combiText.setPosition(50, 200);
+            combiText.setFillColor(sf::Color::White);
+            window.draw(combiText); // affichage de texte
+
+            const vector<int> codeSecret = jeu.getCombinaisonCachee();
+            for (unsigned int i = 0; i < codeSecret.size(); ++i) {
+                sf::CircleShape pion(taillePion / 2);
+                pion.setFillColor(couleurs[codeSecret[i]]);
+                pion.setPosition(50 + i * (taillePion + marge), 260);
+                pion.setOutlineColor(sf::Color::White);
+                pion.setOutlineThickness(2);
+                window.draw(pion); // affichage des pions de la bonne combinaison
+            }
+
+            window.display();
+            continue; // ne pas revenir sur l'affichage de palette de couleurs etc mais rester sur cette page de fin de jeu
+        }
+
 
         window.display();
     }
