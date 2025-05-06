@@ -1,16 +1,4 @@
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <iostream>
-#include <vector>
-#include <cstdlib>
-#include <ctime>
-#include <cassert>
-#include <stack>
-#include <random>
-#include <algorithm>
 using namespace std;
-
-
 #include "mastermind.h"
 
 
@@ -75,16 +63,19 @@ pair<int, int> Mastermind::calculReponse(){
     vector<int> compo = tentatives.top();
     int mal_placee = 0;
     int bonne_couleur = 0;
-    vector<int> pc; //indice des pionts comptabilisés pour ne pas les recomptés
+    vector<int> pc; //indice des pionts comptabilisés pour ne pas les recomptés en j
+    vector<int> pci; //indice des pionts comptabilisés pour ne pas les recomptés en i
     for (int i=0; i<real_comb.size();i++){
         for (int j=0; j<compo.size();j++){
-            if ((real_comb[i]==compo[j]) && (i==j) && (find(pc.begin(), pc.end(), j) == pc.end())){ // comptabilisation des bonnes couleurs
+            if ((real_comb[i]==compo[j]) && (i==j) && (find(pc.begin(), pc.end(), j) == pc.end()) && (find(pci.begin(), pci.end(), i) == pci.end())){ // comptabilisation des bonnes couleurs
                 bonne_couleur++;
                 pc.push_back(j); // on enregistre l'indice pour ne pas a avoir a le recompté
+                pci.push_back(i);
             }
-            else if ((real_comb[i]==compo[j]) && (find(pc.begin(), pc.end(), j) == pc.end()) ){ // comptabilisation des couleurs dont la position est mauvaise
+            else if ((real_comb[i]==compo[j]) && (find(pc.begin(), pc.end(), j) == pc.end()) && (find(pci.begin(), pci.end(), i) == pci.end())){ // comptabilisation des couleurs dont la position est mauvaise
                 mal_placee++;
                 pc.push_back(j); // on enregistre l'indice pour ne pas a avoir a le recompté
+                pci.push_back(i);
             }
         }
     }

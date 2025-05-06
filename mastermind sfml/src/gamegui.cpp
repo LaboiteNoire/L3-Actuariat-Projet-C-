@@ -1,16 +1,4 @@
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <iostream>
-#include <vector>
-#include <cstdlib>
-#include <ctime>
-#include <cassert>
-#include <stack>
-#include <random>
-#include <algorithm>
 using namespace std;
-
-
 #include "mastermind.h"
 #include "gamegui.h"
 

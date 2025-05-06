@@ -563,3 +563,17 @@
 	<random>
 	<algorithm>
 
+1746562540 source:c:\users\g603\documents\workspace\workspace c++\introduction\mastermindsfml deriere version\main.cpp
+	<SFML/Graphics.hpp>
+	<SFML/Audio.hpp>
+	<iostream>
+	<vector>
+	<cstdlib>
+	<ctime>
+	<cassert>
+	<stack>
+	<random>
+	<algorithm>
+	"mastermind.h"
+	"gamegui.h"
+
