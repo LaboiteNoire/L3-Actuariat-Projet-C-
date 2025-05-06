@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1746118425 source:c:\users\goguy\onedrive\bureau\c++\mastermind_console_fini\main.cpp
+	"mastermind_console.h"
+
+1746118376 c:\users\goguy\onedrive\bureau\c++\mastermind_console_fini\mastermind_console.h
+	<iostream>
+	<vector>
+	<cstdlib>
+	<ctime>
+	<cassert>
+
+1746118410 source:c:\users\goguy\onedrive\bureau\c++\mastermind_console_fini\mastermind_console.cpp
+	"mastermind_console.h"
+
