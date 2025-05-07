@@ -216,8 +216,8 @@ void GameGUI::run_my_game(){
             for (int l=0; l<tentatives.size();l++){
                 pair<int, int> res = responses[l];
                 for (int k=0; k< 4; k++){
-                    sf::Sprite emplacement_box;
-                    if (tentatives[l][k]==0){
+                    sf::Sprite emplacement_box; // Création d'un sprite pour représenter le pion
+                    if (tentatives[l][k]==0){ //texture à appliquer au sprite selon la valeur du pion dans la tentative
                         emplacement_box.setTexture(tpal1);
                     }
                     else if (tentatives[l][k]==1){
@@ -242,7 +242,9 @@ void GameGUI::run_my_game(){
                         emplacement_box.setTexture(tpal8);
                     }
                     emplacement_box.setPosition(50 + k * (capacity["taillePion"] + capacity["marge"]), 50 + l * (capacity["taillePion"] + capacity["marge"]));
-                    window.draw(emplacement_box);
+                    window.draw(emplacement_box); // Positionnement du sprite  :
+        // En abscisse : décalage de k fois la largeur d’un pion + une marge.
+        // En ordonnée : décalage de l fois la hauteur d’une ligne de tentative.
                 }
                 for (int b = 0; b < res.first; ++b) {
                     sf::Sprite resultatBP; // pions rouges, pour les bonnes couleurs
@@ -261,7 +263,7 @@ void GameGUI::run_my_game(){
             vector<int> atm;
             atm = jeu.getAtmTry();
             for (int h=0; h<atm.size();h++){
-                sf::Sprite vemplacement_box;
+                sf::Sprite vemplacement_box; // même principe qu'auparavant
                 if (atm[h]==0){
                     vemplacement_box.setTexture(tpal1);
                 }
@@ -341,7 +343,7 @@ void GameGUI::run_my_game(){
             else {
                 finText.setString(" Dommage ! Vous avez perdu !");
             }
-            bganimation();
+            bganimation(); // animation de l'image finale
             window.draw(sprite7);
             window.draw(finText);
             sf::Text combiText("La combinaison etait :", font, 24);
@@ -350,7 +352,9 @@ void GameGUI::run_my_game(){
             window.draw(combiText); // affichage de texte
             const vector<int> codeSecret = jeu.getRealComp();
             for (int h=0; h<codeSecret.size();h++){
-                sf::Sprite vemplacement_box;
+                sf::Sprite vemplacement_box;//sprite pour afficher chaque pion de la combinaison.
+
+            // Faire le jeu de texture
                 if (codeSecret[h]==0){
                     vemplacement_box.setTexture(tpal1);
                 }
@@ -395,9 +399,9 @@ void GameGUI::bganimation(){
     time_t currentTime = time(nullptr);
     tm* localTime = localtime(&currentTime);
     int seconds = localTime->tm_sec;
-    // deuxieme chiffre de la seconde actuelle
+    // deuxieme chiffre de la seconde actuelle : récupère un entier entre 0 et 9
     int va = seconds % 10;
-    // position de l'animation(1 image par secondes) en fonction de la valeur de va
+    // position de l'animation(1 image par secondes) en fonction de la valeur de va on charge une image d'animation
     if (va==0){
         bgtexture.loadFromFile("rsc/anim/sp0.png");
     }
